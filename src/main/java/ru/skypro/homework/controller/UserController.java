@@ -41,7 +41,7 @@ public class UserController {
     @GetMapping("/me") // http://localhost:8080/users/me
     public ResponseEntity<User> getUser() {
         UserEntity user = userService.getUser();
-        if (user != null) {
+        if (authService.getLogin() != null) {
             return ResponseEntity.ok(UserMapper.mapFromUserEntityToUser(user));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
