@@ -36,13 +36,6 @@ public class PhotoServiceImpl implements PhotoService {
         log.info("Запущен метод сервиса {}", LoggingMethodImpl.getMethodName());
         log.info("photoId: {}", photoId);
 
-  /* проверка используется ли, в настоящий момент, данный метод, для работы с updateUserImage,
-           если да, то увеличиваем id на 1, чтобы из БД подтягивался не удаленный аватар, а новый. */
-        if(userService.getImageUpdatingFlag()){
-            log.info("photoId + 1: {}", photoId++);
-            userService.setImageIsUpdatingFlag(false);
-        }
-
         //получаем фото из БД
         PhotoEntity photo = photoRepository.findById(photoId).orElseThrow(PhotoOnDatabaseIsAbsentException::new);
         log.info("Фото найдено - {}", photo.getData() != null);
