@@ -16,6 +16,7 @@ import ru.skypro.homework.repository.UserRepository;
 import ru.skypro.homework.service.AdService;
 import ru.skypro.homework.service.CommentService;
 import ru.skypro.homework.service.impl.AdServiceImpl;
+import ru.skypro.homework.service.impl.CommentServiceImpl;
 import ru.skypro.homework.service.impl.LoggingMethodImpl;
 
 @Slf4j
@@ -24,10 +25,10 @@ import ru.skypro.homework.service.impl.LoggingMethodImpl;
 @RequestMapping("/ads")
 public class CommentController {
     private final UserRepository userRepository;
-    private final CommentService commentService;
+    private final CommentServiceImpl commentService;
     private final AdServiceImpl adService;
 
-    public CommentController(UserRepository userRepository, CommentService commentService, AdServiceImpl adService) {
+    public CommentController(UserRepository userRepository, CommentServiceImpl commentService, AdServiceImpl adService) {
         this.userRepository = userRepository;
         this.commentService = commentService;
         this.adService = adService;
@@ -176,20 +177,10 @@ public class CommentController {
     )
     @PatchMapping("/{adId}/comments/{commentId}")
     @PreAuthorize(value = "hasRole('ADMIN') or @adServiceImpl.isAuthorAd(authentication.getName(), #adId)")
-    public ResponseEntity<Comment> updateComment(@PathVariable("adId") Integer adId,
-                                                 @PathVariable("commentId") Integer commentId,
-                                                 @RequestBody CreateOrUpdateComment createOrUpdateComment,
-                                                 Authentication authentication) {
-        log.info("За запущен метод контроллера: {}", LoggingMethodImpl.getMethodName());
-        log.info("adId: {}", adId);
-        log.info("commentId: {}", commentId);
-        var userRole = authentication.getAuthorities();
-        log.info("роль пользователя - {}", userRole);
-        log.info("isAuthorAd({})", adService.isAuthorAd(authentication.getName(), adId));
-        if (authentication.getName() != null) {
-            Comment comment = commentService.updateComment(commentId, createOrUpdateComment, authentication.getName());
-            return ResponseEntity.ok(comment);
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    public ResponseEntity<Comment> updateComments(@PathVariable Integer adId,
+                                                  @PathVariable Integer commentId,
+                                                  @RequestBody CreateOrUpdateComment createOrUpdateComment,
+                                                  Authentication authentication) {
+        return ResponseEntity.ok(commentService.updateComment(adId, commentId, createOrUpdateComment));
     }
 }

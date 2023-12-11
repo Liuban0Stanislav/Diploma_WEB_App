@@ -13,6 +13,7 @@ import ru.skypro.homework.exception.PasswordIsNotMatchException;
 import ru.skypro.homework.exception.UserNotFoundException;
 import ru.skypro.homework.mapper.UserMapper;
 import ru.skypro.homework.model.AdEntity;
+import ru.skypro.homework.model.ModelEntity;
 import ru.skypro.homework.model.PhotoEntity;
 import ru.skypro.homework.model.UserEntity;
 import ru.skypro.homework.repository.PhotoRepository;
@@ -31,20 +32,13 @@ import java.nio.file.Path;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final PhotoRepository photoRepository;
-    private final UserMapper userMapper;
     private final ImageServiceImpl imageService;
     private final PasswordEncoder encoder;
-    private boolean imageIsUpdatingFlag = false;
-
-    @Value("${path.to.photos.folder}")
-    private String photoDir;
 
 
-    public UserServiceImpl(UserRepository userRepository, PhotoRepository photoRepository, UserMapper userMapper, ImageServiceImpl imageService, PasswordEncoder encoder) {
+
+    public UserServiceImpl(UserRepository userRepository, ImageServiceImpl imageService, PasswordEncoder encoder) {
         this.userRepository = userRepository;
-        this.photoRepository = photoRepository;
-        this.userMapper = userMapper;
         this.imageService = imageService;
         this.encoder = encoder;
     }
@@ -87,10 +81,10 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Метод возвращает информацию о текущем, авторизованном пользователе.
-     * Метод, используя объект {@link Authentication#getName()} как параметр userName,
-     * находит в БД {@link UserRepository}, пользователя с соответствующими данными и возвращает его.
-     * @param username
+     * Метод возвращает из БД сущность соответствующую авторизованному пользователю.
+     * <p>Метод, используя объект {@link Authentication#getName()},
+     * находит в БД {@link UserRepository}, пользователя с соответствующими данными и возвращает его.</p>
+     * @param username - логин авторизованного пользователя.
      * @return объект userEntity
      */
 
@@ -121,19 +115,36 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity updateUser(UpdateUser updateUser, Authentication authentication) {
         log.info("Запущен метод сервиса {}", LoggingMethodImpl.getMethodName());
+
         //Получаем логин авторизованного пользователя из БД
         String userName = authentication.getName();
+
         //Находим данные авторизованного пользователя
         UserEntity user = userRepository.findUserEntityByUserName(userName);
+
         //Меняем данные пользователя на данные из DTO updateUser
         user.setFirstName(updateUser.getFirstName());
         user.setLastName(updateUser.getLastName());
         user.setPhone(updateUser.getPhone());
+
         //сохраняем измененные данные в БД
         userRepository.save(user);
+
         return user;
     }
 
+    /**
+     * Метод, который обновляет аватар пользователя.
+     * <p>Пользователь извлекается из БД и записывается в переменную {@link UserEntity}.
+     * Если старый аватар существует по пути указанном в {@link UserEntity},
+     * то он удается с КП. Из БД аватар удаляется в методе
+     * {@link ImageServiceImpl#updateEntitiesPhoto(MultipartFile, ModelEntity)}.
+     * При помощи того же метода, заполняется поле photo в сущности {@link UserEntity}.
+     * В конце концов сущность сохраняется в БД.</p>
+     * @param image - {@link MultipartFile}
+     * @param authentication - данные авторизации
+     * @throws IOException
+     */
     @Transactional
     @Override
     public void updateUserImage(MultipartFile image, Authentication authentication) throws IOException {
@@ -153,17 +164,5 @@ public class UserServiceImpl implements UserService {
 
         //сохранение сущности user в БД
         userRepository.save(userEntity);
-
-        //понимаем флаг
-        setImageIsUpdatingFlag(true);
-    }
-
-    public boolean getImageUpdatingFlag(){
-        log.info("флажок получен - {}", imageIsUpdatingFlag);
-        return imageIsUpdatingFlag;
-    }
-    public void setImageIsUpdatingFlag(boolean imageIsUpdatingFlag){
-        this.imageIsUpdatingFlag = imageIsUpdatingFlag;
-        log.info("флажок установлен- {}", imageIsUpdatingFlag);
     }
 }

@@ -1,12 +1,14 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.skypro.homework.dto.Comment;
 import ru.skypro.homework.dto.Comments;
 import ru.skypro.homework.dto.CreateOrUpdateComment;
 import ru.skypro.homework.dto.Role;
+import ru.skypro.homework.exception.CommentNotFoundException;
 import ru.skypro.homework.mapper.CommentMapper;
 import ru.skypro.homework.model.AdEntity;
 import ru.skypro.homework.model.CommentEntity;
@@ -139,26 +141,18 @@ public class CommentServiceImpl implements CommentService {
      *
      * @param commentId             - id комментария
      * @param createOrUpdateComment - DTO модель класса {@link CreateOrUpdateComment}
-     * @param username              - логин пользователя
      * @return строку с результатом выполнения метода
      */
-    @Transactional
     @Override
-    public Comment updateComment(Integer commentId, CreateOrUpdateComment createOrUpdateComment, String username) {
-        log.info("Запущен метод сервиса {}", LoggingMethodImpl.getMethodName());
-        Optional<CommentEntity> commentOptional = commentRepository.findById(commentId);
-        if (commentOptional.isPresent()) {
-            CommentEntity comment = commentOptional.get();
-            UserEntity author = userService.getUser(username);
-            if (author.getComments().contains(comment)) {
-                comment.setText(createOrUpdateComment.getText());
-                commentRepository.save(comment);
-                return commentMapper.mapToCommentDto(comment); //'200' Ok, comment updated
-            } else {
-                return commentMapper.mapToCommentDto(comment); //'403' For the user update is forbidden
-            }
-        }
-        return null; //'404' Comment not found
+    public Comment updateComment(Integer adId,
+                                 Integer commentId,
+                                 CreateOrUpdateComment createOrUpdateComment) {
+        log.info("Использован метод сервиса: {}", LoggingMethodImpl.getMethodName());
+
+        CommentEntity comment = commentRepository.findById(commentId).get();
+        comment.setText(createOrUpdateComment.getText());
+        commentRepository.save(comment);
+        return commentMapper.mapToCommentDto(comment);
     }
 
 }
