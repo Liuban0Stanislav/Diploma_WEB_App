@@ -1,5 +1,7 @@
 package ru.skypro.homework.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -20,10 +22,12 @@ public class CommentEntity {
     private Long createdAt;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "author_id")
     private UserEntity author;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "ad_id")
     private AdEntity ad;
 }

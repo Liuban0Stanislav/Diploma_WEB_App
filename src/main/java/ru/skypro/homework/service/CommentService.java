@@ -13,5 +13,7 @@ public interface CommentService {
 
     String deleteComment(Integer commentId, String username);
 
-    Comment updateComment(Integer commentId, CreateOrUpdateComment createOrUpdateComment, String username);
+    Comment updateComment(Integer adId,
+                          Integer commentId,
+                          CreateOrUpdateComment createOrUpdateComment);
 }

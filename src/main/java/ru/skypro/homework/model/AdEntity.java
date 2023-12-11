@@ -1,6 +1,7 @@
 package ru.skypro.homework.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import ru.skypro.homework.dto.Comment;
 
@@ -26,14 +27,16 @@ public class AdEntity extends ModelEntity{
     private String description;
 
     @OneToOne
+    @JsonIgnore
     private PhotoEntity photo;
 
     @ManyToOne
-    @JsonBackReference
+    @JsonIgnore
     @JoinColumn(name = "author_id", nullable = false)
     private UserEntity author;
 
     @OneToMany(mappedBy = "ad", cascade = CascadeType.ALL)
+    @JsonIgnore
     private Collection<CommentEntity> comments;
 
     private String filePath; //путь на ПК
