@@ -1,15 +1,14 @@
 package ru.skypro.homework.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.exception.PhotoOnDatabaseIsAbsentException;
 import ru.skypro.homework.exception.PhotoOnPcIsAbsentException;
 import ru.skypro.homework.model.PhotoEntity;
 import ru.skypro.homework.repository.PhotoRepository;
 import ru.skypro.homework.service.PhotoService;
+import ru.skypro.homework.service.UserService;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Service
@@ -17,17 +16,18 @@ import java.io.IOException;
 public class PhotoServiceImpl implements PhotoService {
     private final PhotoRepository photoRepository;
     private final ImageServiceImpl imageService;
-    @Value("${path.to.photos.folder}")
-    private String photoDir;
+    private final UserServiceImpl userService;
 
-    public PhotoServiceImpl(PhotoRepository photoRepository, ImageServiceImpl imageService) {
+    public PhotoServiceImpl(PhotoRepository photoRepository, ImageServiceImpl imageService, UserServiceImpl userService) {
         this.photoRepository = photoRepository;
         this.imageService = imageService;
+        this.userService = userService;
     }
 
     /**
      * Метод возвращает фото с ПК, а если его там нет по каким-то причинам,
-     * то перенаправляет запрос фото в базу данных.
+     * то перенаправляет запрос на получение фото в базу данных.
+     *
      * @param photoId
      * @return byte[] массив байт
      * @throws IOException
@@ -36,6 +36,7 @@ public class PhotoServiceImpl implements PhotoService {
         log.info("Запущен метод сервиса {}", LoggingMethodImpl.getMethodName());
         log.info("photoId: {}", photoId);
 
+        //получаем фото из БД
         PhotoEntity photo = photoRepository.findById(photoId).orElseThrow(PhotoOnDatabaseIsAbsentException::new);
         log.info("Фото найдено - {}", photo.getData() != null);
 

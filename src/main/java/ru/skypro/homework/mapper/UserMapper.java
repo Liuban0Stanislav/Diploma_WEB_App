@@ -3,6 +3,7 @@ package ru.skypro.homework.mapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.constants.Constants;
 import ru.skypro.homework.dto.Register;
 import ru.skypro.homework.dto.UpdateUser;
 import ru.skypro.homework.dto.User;
@@ -19,6 +20,7 @@ import java.io.IOException;
 @Service
 public class UserMapper {
 
+
     /**
      * {@link Register} -> {@link UserEntity}
      * @param dto {@link Register}
@@ -33,6 +35,7 @@ public class UserMapper {
         entity.setPhone(dto.getPhone());
         entity.setRole(dto.getRole());
         return entity;
+
     }
 
     /**
@@ -47,7 +50,10 @@ public class UserMapper {
         dto.setFirstName(entity.getFirstName());
         dto.setLastName(entity.getLastName());
         dto.setPhone(entity.getPhone());
-        dto.setImage(entity.getImage());
+        dto.setRole(entity.getRole());
+        if (entity.getPhoto() != null) {
+            dto.setImage(Constants.URL_PHOTO_CONSTANT + entity.getPhoto().getId());
+        }
         return dto;
     }
 

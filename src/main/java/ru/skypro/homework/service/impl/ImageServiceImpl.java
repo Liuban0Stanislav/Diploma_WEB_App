@@ -4,17 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ru.skypro.homework.mapper.AdMapper;
 import ru.skypro.homework.mapper.UserMapper;
-import ru.skypro.homework.model.AdEntity;
 import ru.skypro.homework.model.ModelEntity;
 import ru.skypro.homework.model.PhotoEntity;
-import ru.skypro.homework.model.UserEntity;
-import ru.skypro.homework.repository.AdRepository;
 import ru.skypro.homework.repository.PhotoRepository;
 import ru.skypro.homework.service.ImageService;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,33 +31,6 @@ public class ImageServiceImpl implements ImageService {
         this.userMapper = userMapper;
     }
 
-    ///////////////////////перенести в AdService
-//    @Override
-//    public PhotoEntity updateAdImage(Integer id, MultipartFile image, Path filePath) throws IOException {
-//        log.info("Запущен метод сервиса {}", LoggingMethodImpl.getMethodName());
-//        AdEntity adEntity = adRepository.findById(id).orElseThrow(RuntimeException::new);
-//        PhotoEntity photo = adMapper.mapMultipartFileToPhoto(image);
-//        photoRepository.save(photo);
-//        log.info("новое phtotId = {}", photo.getId());
-//        adEntity.setPhoto(photo);
-//
-//        String urlToPhoto = "/photo/image/" + adEntity.getPhoto().getId();
-//        adEntity.setImage(urlToPhoto);
-//        log.info("URL для перехода фронта к методу возврата photo: {}", urlToPhoto);
-//
-//        //адрес до директории хранения фото на ПК
-//        filePath = Path.of(photoDir, adEntity.getPhoto().getId() +/* "-" + properties.getTitle() + */"."
-//                + this.getExtension(image.getOriginalFilename()));
-//        log.info("путь к файлу: {}", filePath);
-//
-//        //сохранение на ПК
-//        this.saveFileOnDisk(adEntity.getPhoto(), filePath);
-//
-//        //сохранение сущности adEntity в БД
-//        adRepository.save(adEntity);
-//        return photo;
-//    }
-
     @Override
     public ModelEntity updateEntitiesPhoto(MultipartFile image, ModelEntity entity) throws IOException {
         //если у сущности уже есть картинка, то нужно ее удалить
@@ -71,18 +39,10 @@ public class ImageServiceImpl implements ImageService {
         }
 
         //заполняем поля photo и сохраняем фото в БД
-        // todo можно сделать photoMapper и перенести этот метод туда, чтоб не путаться
-                PhotoEntity photoEntity = userMapper.mapMuptipartFileToPhoto(image);
+        PhotoEntity photoEntity = userMapper.mapMuptipartFileToPhoto(image);
         log.info("Создана сущность photoEntity - {}", photoEntity != null);
         entity.setPhoto(photoEntity);
         photoRepository.save(photoEntity);
-
-        //записываем URL для перехода фронта к методу возврата аватара
-        String urlToAvatar = "/photo/image/" + entity.getPhoto().getId();
-        log.info("URL для перехода фронта к методу возврата аватара: {}", urlToAvatar);
-
-        //добавляем в сущность URL
-        entity.setImage(urlToAvatar);
 
         //адрес до директории хранения фото на ПК
         Path filePath = Path.of(photoDir, entity.getPhoto().getId() + "."
@@ -90,7 +50,6 @@ public class ImageServiceImpl implements ImageService {
         log.info("путь к файлу для хранения фото на ПК: {}", filePath);
 
         //добавляем в сущность фото путь где оно хранится на ПК
-        // todo мне кажется лучше напрямую photoEntity.setFilePath(filePath.toString()), а не через entity.getPhoto()
         entity.getPhoto().setFilePath(filePath.toString());
 
         //добавляем в сущность путь на ПК
@@ -125,21 +84,6 @@ public class ImageServiceImpl implements ImageService {
         }
         return true;
     }
-
-    public PhotoEntity saveFileOnDisk(PhotoEntity photo, Path filePath) throws IOException {
-        log.info("Запущен метод сервиса {}", LoggingMethodImpl.getMethodName());
-        Files.createDirectories(filePath.getParent());
-        Files.deleteIfExists(filePath);
-        try (InputStream is = new ByteArrayInputStream(photo.getData());
-             OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
-             BufferedInputStream bis = new BufferedInputStream(is, 1024);
-             BufferedOutputStream bos = new BufferedOutputStream(os, 1024);
-        ) {
-            bis.transferTo(bos);
-        }
-        return photo;
-    }
-///////////////////////////////////////
 
     public byte[] getPhotoFromDisk(PhotoEntity photo) {
         Path path1 = Path.of(photo.getFilePath());

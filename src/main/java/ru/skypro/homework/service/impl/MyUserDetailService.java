@@ -27,6 +27,8 @@ public class MyUserDetailService implements UserDetailsService {
         UserEntity user = userRepository.findUserEntityByUserName(username);
         if (user == null) {
             throw new UsernameNotFoundException("Пользователь не найден");
+        }else {
+//            log.info("Пользователь найден - {}", user);
         }
         return User.builder()
                 .username(user.getUserName())

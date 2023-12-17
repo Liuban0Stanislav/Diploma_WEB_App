@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import ru.skypro.homework.constants.Constants;
 import ru.skypro.homework.dto.Ad;
 import ru.skypro.homework.dto.CreateOrUpdateAd;
 import ru.skypro.homework.dto.ExtendedAd;
@@ -33,7 +34,9 @@ public class AdMapper {
     public Ad mapToAdDto(AdEntity entity) {
         Ad dto = new Ad();
         dto.setAuthor(entity.getAuthor().getId());
-        dto.setImage(entity.getImage());
+        if (entity.getPhoto() != null) {
+            dto.setImage(Constants.URL_PHOTO_CONSTANT + entity.getPhoto().getId());
+        }
         dto.setPk(entity.getId());
         dto.setPrice(entity.getPrice());
         dto.setTitle(entity.getTitle());
@@ -73,7 +76,7 @@ public class AdMapper {
         dto.setAuthorLastName(entity.getAuthor().getLastName());
         dto.setDescription(entity.getDescription());
         dto.setEmail(entity.getAuthor().getUserName());
-        dto.setImage(entity.getImage());
+        dto.setImage(Constants.URL_PHOTO_CONSTANT + entity.getPhoto().getId());
         dto.setPhone(entity.getAuthor().getPhone());
         dto.setPrice(entity.getPrice());
         dto.setTitle(entity.getTitle());

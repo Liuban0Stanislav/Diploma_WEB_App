@@ -18,7 +18,7 @@ public interface AdService {
 
     ExtendedAd getAds(Integer id);
 
-    boolean removeAd(Integer id);
+    boolean removeAd(Integer id) throws IOException;
 
     Ad updateAds(Integer id, CreateOrUpdateAd dto);
 

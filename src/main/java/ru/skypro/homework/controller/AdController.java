@@ -139,7 +139,7 @@ public class AdController {
     )
     @DeleteMapping("/{id}")
     @PreAuthorize(value = "hasRole('ADMIN') or @adServiceImpl.isAuthorAd(authentication.getName(), #adId)")
-    public ResponseEntity removeAd(@PathVariable("id") Integer adId) {
+    public ResponseEntity removeAd(@PathVariable("id") Integer adId) throws IOException {
         log.info("За запущен метод контроллера: {}", LoggingMethodImpl.getMethodName());
         return (adService.removeAd(adId)) ? ResponseEntity.status(HttpStatus.NO_CONTENT).build() :
                 ResponseEntity.status(HttpStatus.NOT_FOUND).build();

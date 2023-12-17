@@ -24,7 +24,7 @@ public interface UserService {
      * @param authentication
      * @return объект {@link UserEntity}, содержащий информацию о пользователе.
      */
-    UserEntity getUser(Authentication authentication);
+    UserEntity getUser(String userName);
 
     /**
      * Метод обновляет информацию об авторизованном пользователе.
@@ -33,13 +33,6 @@ public interface UserService {
      * @return объект {@link UserEntity}
      */
     UserEntity updateUser(UpdateUser updateUser, Authentication authentication);
-
-    /**
-     * Метод ищет пользователя по логину и возвращает объект {@link UserEntity}.
-     * @param username (логин)
-     * @return {@link UserEntity}
-     */
-    UserEntity checkUserByUsername(String username);
 
     /**
      * Метод обновляет аватар авторизованного пользователя.

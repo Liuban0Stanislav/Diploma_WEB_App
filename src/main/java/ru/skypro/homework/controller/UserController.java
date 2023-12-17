@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import ru.skypro.homework.service.impl.LoggingMethodImpl;
+import ru.skypro.homework.service.impl.UserServiceImpl;
 
 import java.awt.*;
 import java.io.IOException;
@@ -31,9 +32,9 @@ import java.io.IOException;
 @CrossOrigin("http://localhost:3000")
 @RequestMapping("/users")
 public class UserController {
-    private UserService userService;
+    private UserServiceImpl userService;
 
-    public UserController(UserService userService) {
+    public UserController(UserServiceImpl userService) {
         this.userService = userService;
     }
 
@@ -92,7 +93,7 @@ public class UserController {
     @GetMapping("/me") // http://localhost:8080/users/me
     public ResponseEntity<User> getUser(Authentication authentication) {
         log.info("Запущен метод контроллера: {}", LoggingMethodImpl.getMethodName());
-        UserEntity user = userService.getUser(authentication);
+        UserEntity user = userService.getUser(authentication.getName());
         if (user != null) {
             return ResponseEntity.ok(UserMapper.mapFromUserEntityToUser(user));
         } else {

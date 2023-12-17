@@ -1,6 +1,7 @@
 package ru.skypro.homework.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import ru.skypro.homework.dto.Register;
 import ru.skypro.homework.dto.Role;
@@ -37,10 +38,6 @@ public class UserEntity extends ModelEntity{
     @OneToMany(mappedBy = "author")
     private Collection<CommentEntity> comments;
 
-    /**
-     * поле куда записывается URL для доступа к методу возврата аватарки
-     */
-    private String image; //URL для контроллера
     private String filePath; //путь на ПК
 
     @Override
@@ -53,10 +50,9 @@ public class UserEntity extends ModelEntity{
                 ", lastName='" + lastName + '\'' +
                 ", phone='" + phone + '\'' +
                 ", role=" + role +
-                ", photo=" + photo +
+                ", photo=" + (photo != null)  +
                 ", ads=" + ads +
                 ", comments=" + comments +
-                ", image='" + image + '\'' +
                 '}';
     }
 }
