@@ -59,6 +59,7 @@ public class UserServiceImpl implements UserService {
      * @param authentication содержит логин авторизованного пользователя.
      */
     @Override
+    @Transactional
     public void setPassword(NewPassword newPass, Authentication authentication) {
         log.info("Запущен метод сервиса {}", LoggingMethodImpl.getMethodName());
         //получаем в переменную старый пароль
